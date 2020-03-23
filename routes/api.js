@@ -3,7 +3,7 @@ const router = express.Router();
 const  fetch = require('node-fetch');
 const NodeCache = require('node-cache');
 const CACHE_KEY = 'lastNews';
-const ttl = 1000*5;
+const ttl = 1000*60*5;
 const newsCache = new NodeCache();
 
 const  getNewsFromApi = () => {
