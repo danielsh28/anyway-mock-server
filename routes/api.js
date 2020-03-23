@@ -22,9 +22,7 @@ setInterval(initCache,ttl);
 
 async function getNewsFromCache(fetchApiFunc){
     let val;
-    while(!val){
-        val = newsCache.get(CACHE_KEY);
-    }
+    val = newsCache.get(CACHE_KEY);
     return val;
 }
 
