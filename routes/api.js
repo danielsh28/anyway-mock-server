@@ -2,35 +2,34 @@ const express = require('express');
 const router = express.Router();
 const  fetch = require('node-fetch');
 const NodeCache = require('node-cache');
-const CACHE_KEY = 'lastNews';
-const ttl = 1000*60*5;
+const ttl = 1000*60*60*2;
 const newsCache = new NodeCache();
+const ANYWAY_URL = 'https://anyway.co.il/api';
 
-const  getNewsFromApi = () => {
-    return fetch('https://anyway.co.il/api/news-flash-filters?news_flash_count=10')
-        .then((realServerRes)=>realServerRes.json())
+const  getDataFromApi = (url) => {
+    return fetch(url)
+        .then((realServerRes)=>realServerRes.json()).catch(err=>console.log(err));
 };
 
-async function initCache(){
-    console.log(newsCache.getTtl(CACHE_KEY));
-    await getNewsFromApi().then((jsonObject) => {
-        newsCache.set(CACHE_KEY, jsonObject);
-    })
-};
-initCache();
-setInterval(initCache,ttl);
 
-async function getNewsFromCache(fetchApiFunc){
-    let val;
-    val = newsCache.get(CACHE_KEY);
-    return val;
+setInterval(()=>newsCache.flushAll(),ttl);
+
+async function getNewsFromCache(urlAsKey){
+    let dataFromCache;
+    dataFromCache = newsCache.get(urlAsKey);
+    if(dataFromCache === undefined){
+        dataFromCache = await getDataFromApi(urlAsKey);
+        newsCache.set(urlAsKey,dataFromCache);
+    }
+    return dataFromCache;
 }
 
 
 
-router.get('/' ,async function (req,res){
-    const   newsdata = await getNewsFromCache();
-    res.send(newsdata);
+router.get('/*' ,async function (req,res){
+    const url = `${ANYWAY_URL}${req.url}`;
+    const dateToSend = await  getNewsFromCache(url);
+    res.send(dateToSend);
 });
 
 
