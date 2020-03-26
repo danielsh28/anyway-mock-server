@@ -4,7 +4,7 @@ const  fetch = require('node-fetch');
 const NodeCache = require('node-cache');
 const ttl = 1000*60*60*2;
 const newsCache = new NodeCache();
-const ANYWAY_URL = 'https://anyway.co.il/api';
+const ANYWAY_URL = 'https://anyway.co.il/';
 
 const  getDataFromApi = (url) => {
     return fetch(url)
